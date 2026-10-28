@@ -1,0 +1,8 @@
+@* Combines sent and received messages while visually identifying unread incoming items. *@
+@model IReadOnlyList<Message>
+@{ ViewData["Title"] = "Messages"; var currentUserId = (string)ViewBag.CurrentUserId; }
+<div class="container"><div class="dashboard-header"><div><span class="eyebrow">Database-backed inbox</span><h1>Messages</h1><p class="text-muted mb-0">Read and reply to conversations with other Staybnb users.</p></div><a class="btn btn-primary" asp-action="Compose"><i class="bi bi-pencil-square" aria-hidden="true"></i> New message</a></div>
+<div class="panel p-0 overflow-hidden">
+    @if (Model.Count == 0) { <div class="empty-state m-4"><i class="bi bi-inbox empty-state-icon" aria-hidden="true"></i><strong>Your inbox is empty</strong><span>New conversations will appear here.</span></div> }
+    <div class="list-group list-group-flush">@foreach (var message in Model) { var incoming = message.RecipientId == currentUserId; <a asp-action="Read" asp-route-id="@message.Id" class="list-group-item list-group-item-action p-3 @(incoming && !message.IsRead ? "message-unread" : "")"><div class="d-flex flex-column flex-sm-row justify-content-between gap-2 gap-sm-3"><div><span class="small text-muted">@(incoming ? "From" : "To") @(incoming ? message.Sender?.DisplayName : message.Recipient?.DisplayName)</span><div>@message.Subject</div><div class="text-muted small">@(message.Body.Length > 100 ? message.Body[..100] + "..." : message.Body)</div></div><div class="text-sm-end text-nowrap"><small class="text-muted">@message.SentAt.ToString("dd MMM HH:mm")</small>@if (incoming && !message.IsRead) { <div><span class="status status--unread">Unread</span></div> }</div></div></a> }</div>
+</div></div>

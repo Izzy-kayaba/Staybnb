@@ -1,0 +1,20 @@
+@* Reused by property galleries so image ratios, prices and actions remain identical. *@
+@model HostProperty
+
+<article class="property-card">
+    <img src="@(Model.Images.FirstOrDefault()?.ImageUrl ?? "/images/properties/modern-apartment.png")" alt="@Model.Title" loading="lazy" />
+    <div class="property-card-body">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+            <h3>@Model.Title</h3>
+            <span class="pill flex-shrink-0">@Model.PropertyType</span>
+        </div>
+        <p class="text-muted mb-2"><i class="bi bi-geo-alt" aria-hidden="true"></i> @Model.City · @Model.Address</p>
+        <p class="line-clamp">@Model.Description</p>
+        <div class="property-card-footer">
+            <strong>@($"R{Model.PricePerNight:N2}") <small>/ night</small></strong>
+            <a class="stretched-link text-decoration-none" asp-controller="Home" asp-action="Details" asp-route-id="@Model.Id">
+                View stay <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+</article>

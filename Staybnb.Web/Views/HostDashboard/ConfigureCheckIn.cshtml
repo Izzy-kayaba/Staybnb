@@ -1,0 +1,7 @@
+@* Lets a Host define the rules and document required for this property's check-in. *@
+@model HostProperty
+@{ ViewData["Title"] = "Check-in process"; }
+<div class="container py-5"><div class="row justify-content-center"><div class="col-lg-7"><a asp-action="Index" class="back-link">← Host dashboard</a><form method="post" class="panel mt-3"><input name="id" value="@Model.Id" type="hidden" /><span class="eyebrow">@Model.Title</span><h1 class="h2 fw-bold">Configure check-in</h1><p class="text-muted">Define the rules and document the guest must provide.</p><div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3"><label for="checkInRules" class="form-label">Check-in rules</label><textarea id="checkInRules" name="checkInRules" class="form-control" required>@Model.CheckInRules</textarea></div>
+    <div class="mb-3"><label asp-for="RequiredDocumentType" class="form-label">Required document</label><select asp-for="RequiredDocumentType" class="form-select" asp-items="Html.GetEnumSelectList<DocumentType>()"></select></div>
+    <button class="btn btn-primary" type="submit">Save check-in process</button></form></div></div></div>

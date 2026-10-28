@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+.vs/
+Staybnb.Web/App_Data/
+Staybnb.Web/wwwroot/uploads/
+tmp/
+*.user
+*.suo

@@ -1,0 +1,32 @@
+@* Public discovery intentionally renders only the active properties returned by HomeController. *@
+@model IReadOnlyList<HostProperty>
+@{
+    ViewData["Title"] = "Find a stay";
+}
+
+<section class="hero">
+    <div class="container py-5">
+        <span class="eyebrow">Stay somewhere memorable</span>
+        <h1>Find your next South African stay.</h1>
+        <p>Browse approved homes, request your dates and manage the whole trip in one place.</p>
+        <form method="get" class="search-panel row g-2">
+            <div class="col-md-5"><label for="city">City</label><input id="city" name="city" value="@ViewBag.City" class="form-control" placeholder="Cape Town" /></div>
+            <div class="col-md-4"><label for="propertyType">Property type</label><select id="propertyType" name="propertyType" class="form-select"><option value="">All property types</option>@foreach (var type in (IEnumerable<string>)ViewBag.PropertyTypes) { <option value="@type" selected="@(ViewBag.PropertyType == type)">@type</option> }</select></div>
+            <div class="col-md-3 d-flex align-items-end"><button class="btn btn-primary w-100" type="submit"><i class="bi bi-search" aria-hidden="true"></i> Search stays</button></div>
+        </form>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="section-heading"><div><span class="eyebrow">Active listings</span><h2>Places guests can book</h2></div><span class="result-count">@Model.Count @(Model.Count == 1 ? "result" : "results")</span></div>
+    @if (Model.Count == 0)
+    {
+        <div class="empty-state"><i class="bi bi-house-x empty-state-icon" aria-hidden="true"></i><strong>No stays found</strong><span>No active properties match those filters. Try another city or property type.</span></div>
+    }
+    <div class="property-grid">
+        @foreach (var property in Model)
+        {
+            <partial name="_PropertyCard" model="property" />
+        }
+    </div>
+</section>

@@ -1,0 +1,29 @@
+@* Shows the three assessed check-in stages and only permits an allowed document upload. *@
+@model Booking
+@{ ViewData["Title"] = "Guest check-in"; var document = Model.Documents.OrderByDescending(d => d.UploadedAt).FirstOrDefault(); }
+<div class="container py-5"><div class="row justify-content-center"><div class="col-lg-8">
+    <span class="eyebrow">Guest check-in</span><h1 class="fw-bold">@Model.Property?.Title</h1>
+    <div class="steps"><div class="step done">1. Booking approved</div><div class="step @(document is null ? "current" : "done")">2. Upload document</div><div class="step @(Model.Status == BookingStatus.CheckedIn ? "done" : document is not null ? "current" : "")">3. Host verifies</div></div>
+    <div class="panel">
+        <h2 class="h5 fw-bold">Property check-in rules</h2><p>@Model.Property?.CheckInRules</p><p class="mb-0"><strong>Required document:</strong> @Model.Property?.RequiredDocumentType</p>
+    </div>
+    @if (Model.Status == BookingStatus.CheckedIn)
+    {
+        <div class="alert alert-success"><strong>Check-in complete.</strong> Your document has been verified by the Host.</div>
+    }
+    else if (document is not null && document.Status == DocumentStatus.Pending)
+    {
+        <div class="alert alert-info"><strong>Document uploaded.</strong> @document.OriginalFileName is awaiting Host verification.</div>
+    }
+    else
+    {
+        @if (document?.Status == DocumentStatus.Rejected) { <div class="alert alert-danger">The previous document was rejected. Please upload a clearer copy.</div> }
+        <form asp-action="UploadDocument" method="post" enctype="multipart/form-data" class="panel" data-loading-form data-loading-text="Uploading...">
+            <input name="BookingId" value="@Model.Id" type="hidden" /><input name="DocumentType" value="@Model.Property?.RequiredDocumentType" type="hidden" />
+            <label for="Document" class="form-label">ID or passport file</label><input id="Document" name="Document" type="file" accept=".jpg,.jpeg,.png,.pdf" class="form-control" required data-file-input data-file-status="document-file-status" />
+            <div class="form-text">JPG, PNG or PDF, maximum 5 MB. Files are stored outside the public web folder.</div>
+            <div id="document-file-status" class="upload-status" aria-live="polite">No file selected.</div>
+            <button class="btn btn-primary mt-3" type="submit"><i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> Upload for verification</button>
+        </form>
+    }
+</div></div></div>

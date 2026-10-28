@@ -1,0 +1,17 @@
+@* Shows a safe production error message and a traceable request identifier when available. *@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="container py-5">
+    <div class="panel">
+        <h1 class="text-danger">Something went wrong.</h1>
+        <p>The request could not be completed. Please return to the home page and try again.</p>
+        @if (Model.ShowRequestId)
+        {
+            <p><strong>Request ID:</strong> <code>@Model.RequestId</code></p>
+        }
+        <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Return home</a>
+    </div>
+</div>

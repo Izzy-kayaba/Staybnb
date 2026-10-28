@@ -1,0 +1,133 @@
+@* Presents only the current Host's listings, pending bookings, and documents awaiting review. *@
+@model HostDashboardViewModel
+@{ ViewData["Title"] = "Host dashboard"; }
+
+<div class="container">
+    <div class="dashboard-header">
+        <div>
+            <span class="eyebrow">Host workspace</span>
+            <h1>Host dashboard</h1>
+            <p class="text-muted mb-0">Manage listings, booking requests and guest documents.</p>
+        </div>
+        <a class="btn btn-primary" asp-controller="HostApplications" asp-action="Apply"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add another property</a>
+    </div>
+
+    <section class="dashboard-stats" aria-label="Host dashboard summary">
+        <div class="stat-card"><strong>@Model.Properties.Count</strong><span>Total properties</span></div>
+        <div class="stat-card"><strong>@Model.PendingBookings.Count</strong><span>Pending booking requests</span></div>
+        <div class="stat-card"><strong>@Model.PendingDocuments.Count</strong><span>Documents awaiting review</span></div>
+    </section>
+
+    <section class="panel">
+        <div class="section-heading">
+            <div><span class="eyebrow">Listings</span><h2 class="h4">My properties</h2></div>
+            <span>@Model.Properties.Count total</span>
+        </div>
+        @if (Model.Properties.Count == 0)
+        {
+            <div class="empty-state"><i class="bi bi-house-add empty-state-icon" aria-hidden="true"></i><strong>No properties yet</strong><span>Use “Add another property” to submit one for review.</span></div>
+        }
+        <div class="table-responsive">
+            <table class="table responsive-table">
+                <thead><tr><th>Property</th><th>Rates</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                @foreach (var property in Model.Properties)
+                {
+                    var status = property.Application?.Status switch
+                    {
+                        ApplicationStatus.Pending => "Pending review",
+                        ApplicationStatus.Rejected => "Rejected",
+                        _ => property.IsActive ? "Active" : "Inactive"
+                    };
+                    var statusClass = property.Application?.Status switch
+                    {
+                        ApplicationStatus.Pending => "status--pending-review",
+                        ApplicationStatus.Rejected => "status--rejected",
+                        _ => property.IsActive ? "status--active" : "status--inactive"
+                    };
+                    <tr>
+                        <td data-label="Property">
+                            <strong>@property.Title</strong>
+                            <div class="text-muted small">@property.City · @property.PropertyType</div>
+                        </td>
+                        <td data-label="Rates">@($"R{property.PricePerNight:N2} / night")</td>
+                        <td data-label="Status"><span class="status @statusClass">@status</span></td>
+                        <td data-label="Actions">
+                            <div class="action-group">
+                                <a class="btn btn-sm btn-outline-dark" asp-action="EditProperty" asp-route-id="@property.Id"><i class="bi bi-pencil" aria-hidden="true"></i> Edit</a>
+                                <a class="btn btn-sm btn-outline-dark" asp-action="ConfigureCheckIn" asp-route-id="@property.Id"><i class="bi bi-list-check" aria-hidden="true"></i> Check-in rules</a>
+                                @if (property.IsActive || property.CanActivate)
+                                {
+                                    <form asp-action="ToggleActive" asp-route-id="@property.Id" method="post">
+                                        <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi @(property.IsActive ? "bi-pause-circle" : "bi-play-circle")" aria-hidden="true"></i> @(property.IsActive ? "Deactivate" : "Activate")</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small align-self-center">Admin approval is required before activation.</span>
+                                }
+                                @if (property.Bookings.Count == 0)
+                                {
+                                    <form asp-action="DeleteProperty" asp-route-id="@property.Id" method="post" onsubmit="return confirm('Delete this property?');">
+                                        <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-trash" aria-hidden="true"></i> Delete</button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="section-heading">
+            <div><span class="eyebrow">Bookings</span><h2 class="h4">Pending requests</h2></div>
+            <span>@Model.PendingBookings.Count pending</span>
+        </div>
+        @if (Model.PendingBookings.Count == 0)
+        {
+            <div class="empty-state"><i class="bi bi-calendar2-check empty-state-icon" aria-hidden="true"></i><strong>Nothing to review</strong><span>No booking requests are waiting for a decision.</span></div>
+        }
+        @foreach (var booking in Model.PendingBookings)
+        {
+            <div class="border rounded-3 p-3 mb-3 d-md-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@booking.Property?.Title</strong>
+                    <div class="text-muted">@booking.Guest?.DisplayName · @booking.CheckInDate.ToString("dd MMM") - @booking.CheckOutDate.ToString("dd MMM yyyy") · @booking.NumberOfTravellers guest(s)</div>
+                    <div class="mt-1">Total: <strong>@($"R{booking.TotalPrice:N2}")</strong></div>
+                </div>
+                <div class="action-group mt-3 mt-md-0">
+                    <form asp-action="BookingDecision" asp-route-id="@booking.Id" method="post"><input type="hidden" name="decision" value="Approve" /><button class="btn btn-success"><i class="bi bi-check-lg" aria-hidden="true"></i> Approve</button></form>
+                    <form asp-action="BookingDecision" asp-route-id="@booking.Id" method="post"><input type="hidden" name="decision" value="Reject" /><button class="btn btn-outline-danger"><i class="bi bi-x-lg" aria-hidden="true"></i> Reject</button></form>
+                </div>
+            </div>
+        }
+    </section>
+
+    <section class="panel">
+        <div class="section-heading">
+            <div><span class="eyebrow">Check-in</span><h2 class="h4">Documents to verify</h2></div>
+            <span>@Model.PendingDocuments.Count pending</span>
+        </div>
+        @if (Model.PendingDocuments.Count == 0)
+        {
+            <div class="empty-state"><i class="bi bi-file-earmark-check empty-state-icon" aria-hidden="true"></i><strong>All documents reviewed</strong><span>No guest documents are waiting for verification.</span></div>
+        }
+        @foreach (var document in Model.PendingDocuments)
+        {
+            <div class="border rounded-3 p-3 mb-3 d-md-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@document.UploadedBy?.DisplayName</strong>
+                    <div class="text-muted">@document.Booking?.Property?.Title · @document.DocumentType · @document.OriginalFileName</div>
+                </div>
+                <div class="action-group mt-3 mt-md-0">
+                    <a class="btn btn-outline-dark" asp-action="DownloadDocument" asp-route-id="@document.Id"><i class="bi bi-eye" aria-hidden="true"></i> View file</a>
+                    <form asp-action="VerifyDocument" asp-route-id="@document.Id" method="post"><input type="hidden" name="decision" value="Verify" /><button class="btn btn-success"><i class="bi bi-check-lg" aria-hidden="true"></i> Verify and check in</button></form>
+                    <form asp-action="VerifyDocument" asp-route-id="@document.Id" method="post"><input type="hidden" name="decision" value="Reject" /><button class="btn btn-outline-danger"><i class="bi bi-x-lg" aria-hidden="true"></i> Reject</button></form>
+                </div>
+            </div>
+        }
+    </section>
+</div>

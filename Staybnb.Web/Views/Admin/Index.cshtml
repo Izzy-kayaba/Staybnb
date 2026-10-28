@@ -1,0 +1,91 @@
+@* Gives Admins the full submitted property information needed for a defensible decision. *@
+@model AdminDashboardViewModel
+@{ ViewData["Title"] = "Admin dashboard"; }
+
+<div class="container">
+    <div class="dashboard-header">
+        <div>
+            <span class="eyebrow">Marketplace oversight</span>
+            <h1>Admin dashboard</h1>
+            <p class="text-muted mb-0">Review applications, manage authorised roles and inspect the activity trail.</p>
+        </div>
+        <span class="pill">@(Model.IsSuperAdmin ? "SuperAdmin" : "Admin")</span>
+    </div>
+
+    <section class="dashboard-stats" aria-label="Admin dashboard summary">
+        <div class="stat-card"><strong>@Model.PendingApplications.Count</strong><span>Applications awaiting review</span></div>
+        <div class="stat-card"><strong>@Model.RecentActivity.Count</strong><span>Recent audit entries shown</span></div>
+        <div class="stat-card"><strong>@(Model.IsSuperAdmin ? Model.Guests.Count : 0)</strong><span>Guests eligible for Admin promotion</span></div>
+    </section>
+
+    <section class="panel">
+        <div class="section-heading">
+            <div><span class="eyebrow">Application review</span><h2 class="h4">Pending Host and property applications</h2></div>
+            <span>@Model.PendingApplications.Count pending</span>
+        </div>
+        @if (Model.PendingApplications.Count == 0)
+        {
+            <div class="empty-state"><i class="bi bi-clipboard-check empty-state-icon" aria-hidden="true"></i><strong>Review queue clear</strong><span>No Host or property applications await review.</span></div>
+        }
+        @foreach (var application in Model.PendingApplications)
+        {
+            <div class="border rounded-3 p-3 mb-3">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <img src="@application.Property?.Images.FirstOrDefault()?.ImageUrl" class="img-fluid rounded" alt="@application.Property?.Title" />
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <strong>@application.Property?.Title</strong>
+                        <div class="text-muted">@application.Property?.PropertyType · @application.Property?.Address, @application.Property?.City</div>
+                        <p class="my-2">@application.Property?.Description</p>
+                        <div>Applicant: @application.Applicant?.DisplayName (@application.Applicant?.Email)</div>
+                        <div>@($"R{(application.Property?.PricePerNight ?? 0):N2} / night")</div>
+                        <div class="text-muted small">Cleaning: @($"R{(application.Property?.CleaningFee ?? 0):N2}") · Service: @($"R{(application.Property?.ServiceFee ?? 0):N2}")</div>
+                    </div>
+                    <div class="col-md-3 mt-3 mt-md-0">
+                        <div class="action-group">
+                            <form asp-action="ApproveApplication" asp-route-id="@application.Id" method="post"><button class="btn btn-success"><i class="bi bi-check-lg" aria-hidden="true"></i> Approve</button></form>
+                            <form asp-action="RejectApplication" asp-route-id="@application.Id" method="post"><input name="reason" value="The property information needs improvement." type="hidden" /><button class="btn btn-outline-danger"><i class="bi bi-x-lg" aria-hidden="true"></i> Reject</button></form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </section>
+
+    @if (Model.IsSuperAdmin)
+    {
+        <section class="panel">
+            <div class="section-heading">
+                <div><span class="eyebrow">SuperAdmin only</span><h2 class="h4">Promote a Guest to Admin</h2></div>
+            </div>
+            <p class="text-muted">Guests with pending Host applications are excluded until that application is decided.</p>
+            <div class="table-responsive">
+                <table class="table responsive-table">
+                    <thead><tr><th>Guest</th><th>Email</th><th></th></tr></thead>
+                    <tbody>
+                    @foreach (var guest in Model.Guests)
+                    {
+                        <tr><td data-label="Guest">@guest.DisplayName</td><td data-label="Email">@guest.Email</td><td data-label="Action" class="text-end"><form asp-action="PromoteToAdmin" asp-route-id="@guest.Id" method="post"><button class="btn btn-sm btn-outline-dark"><i class="bi bi-person-up" aria-hidden="true"></i> Promote to Admin</button></form></td></tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+
+    <section class="panel">
+        <div class="section-heading"><div><span class="eyebrow">System audit</span><h2 class="h4">Recent activity</h2></div><span>Latest 50</span></div>
+        <div class="table-responsive">
+            <table class="table responsive-table">
+                <thead><tr><th>Time (UTC)</th><th>Action</th><th>User</th><th>Details</th></tr></thead>
+                <tbody>
+                @foreach (var log in Model.RecentActivity)
+                {
+                    <tr><td data-label="Time (UTC)">@log.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td><td data-label="Action"><span class="status status--neutral">@log.Action</span></td><td data-label="User">@(log.User?.Email ?? "System")</td><td data-label="Details">@log.Details</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

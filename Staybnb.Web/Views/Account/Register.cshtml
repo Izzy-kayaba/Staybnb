@@ -1,0 +1,23 @@
+@* Makes the initial Guest role clear before a new account is created. *@
+@model RegisterViewModel
+@{ ViewData["Title"] = "Create account"; }
+<div class="container">
+    <div class="auth-card">
+        <span class="eyebrow">Start as a Guest</span>
+        <h1 class="h2 fw-bold mt-2">Create your Staybnb account</h1>
+        <p class="text-muted">Every new account receives the Guest role automatically.</p>
+        <form method="post" data-loading-form data-loading-text="Creating account...">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row g-3">
+                <div class="col-sm-6"><label asp-for="FirstName" class="form-label"></label><input asp-for="FirstName" class="form-control" /><span asp-validation-for="FirstName" class="text-danger"></span></div>
+                <div class="col-sm-6"><label asp-for="LastName" class="form-label"></label><input asp-for="LastName" class="form-control" /><span asp-validation-for="LastName" class="text-danger"></span></div>
+                <div class="col-12"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /><span asp-validation-for="Email" class="text-danger"></span></div>
+                <div class="col-12"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control" /><span asp-validation-for="Password" class="text-danger"></span><div class="form-text">At least 6 characters with uppercase, lowercase, number and symbol.</div></div>
+                <div class="col-12"><label asp-for="ConfirmPassword" class="form-label"></label><input asp-for="ConfirmPassword" class="form-control" /><span asp-validation-for="ConfirmPassword" class="text-danger"></span></div>
+            </div>
+            <button class="btn btn-primary w-100 mt-4" type="submit"><i class="bi bi-person-plus" aria-hidden="true"></i> Register as Guest</button>
+        </form>
+        <p class="text-center mt-3 mb-0">Already registered? <a asp-action="Login">Log in</a></p>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

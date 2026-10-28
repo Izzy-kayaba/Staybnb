@@ -1,0 +1,6 @@
+@* Converts a workflow status into the shared visual badge style. *@
+@model string
+@{
+    var statusClass = Model.Replace(" ", "-").ToLowerInvariant();
+}
+<span class="status status--@statusClass">@Model</span>

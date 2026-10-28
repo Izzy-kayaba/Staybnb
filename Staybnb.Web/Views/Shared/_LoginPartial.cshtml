@@ -1,0 +1,21 @@
+@* Switches the account controls between registration/login and authenticated logout. *@
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<ul class="navbar-nav align-items-lg-center">
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item"><span class="nav-link small text-muted">@User.Identity?.Name</span></li>
+    <li class="nav-item">
+        <form asp-controller="Account" asp-action="Logout" method="post">
+            <button type="submit" class="btn btn-outline-dark btn-sm"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Log out</button>
+        </form>
+    </li>
+}
+else
+{
+    <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Register"><i class="bi bi-person-plus" aria-hidden="true"></i> Register</a></li>
+    <li class="nav-item"><a class="btn btn-dark btn-sm" asp-controller="Account" asp-action="Login"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Log in</a></li>
+}
+</ul>

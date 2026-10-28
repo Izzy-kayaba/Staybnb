@@ -1,0 +1,4 @@
+@* Displays one authorised message and offers a reply to the other participant. *@
+@model Message
+@{ ViewData["Title"] = Model.Subject; var currentUserId = (string)ViewBag.CurrentUserId; var other = Model.SenderId == currentUserId ? Model.Recipient : Model.Sender; }
+<div class="container py-5"><div class="row justify-content-center"><div class="col-lg-8"><a asp-action="Index" class="back-link"><i class="bi bi-arrow-left" aria-hidden="true"></i> Inbox</a><article class="panel mt-3"><span class="eyebrow">Conversation</span><h1 class="h3 fw-bold">@Model.Subject</h1><div class="text-muted mb-4">From @Model.Sender?.DisplayName to @Model.Recipient?.DisplayName · @Model.SentAt.ToString("dd MMM yyyy HH:mm") UTC</div><p style="white-space:pre-line">@Model.Body</p><a class="btn btn-primary mt-3" asp-action="Reply" asp-route-id="@Model.Id"><i class="bi bi-reply" aria-hidden="true"></i> Reply to @other?.DisplayName</a></article></div></div></div>

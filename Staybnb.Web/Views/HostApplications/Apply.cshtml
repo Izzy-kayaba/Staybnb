@@ -1,0 +1,27 @@
+@* Requires one property image and explains that Admin approval precedes activation. *@
+@model HostApplicationViewModel
+@{ ViewData["Title"] = User.IsInRole("Host") ? "Add a property" : "Become a host"; }
+<div class="container py-5">
+    <div class="row justify-content-center"><div class="col-lg-8">
+        <span class="eyebrow">Hosting application</span>
+        <h1 class="fw-bold">Tell us about your property</h1>
+        <p class="text-muted">An Admin reviews the property and its image before it becomes active.</p>
+        @if (ViewBag.HasPendingApplication == true) { <div class="alert alert-warning">You already have an application waiting for review.</div> }
+        <form method="post" enctype="multipart/form-data" class="panel" data-loading-form data-loading-text="Submitting application...">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row g-3">
+                <div class="col-12"><label asp-for="Title" class="form-label"></label><input asp-for="Title" class="form-control" /><span asp-validation-for="Title" class="text-danger"></span></div>
+                <div class="col-12"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" class="form-control"></textarea><span asp-validation-for="Description" class="text-danger"></span></div>
+                <div class="col-md-4"><label asp-for="PricePerNight" class="form-label"></label><input asp-for="PricePerNight" class="form-control" /><span asp-validation-for="PricePerNight" class="text-danger"></span></div>
+                <div class="col-md-4"><label asp-for="CleaningFee" class="form-label"></label><input asp-for="CleaningFee" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="ServiceFee" class="form-label"></label><input asp-for="ServiceFee" class="form-control" /></div>
+                <div class="col-12"><label asp-for="Address" class="form-label"></label><input asp-for="Address" class="form-control" /><span asp-validation-for="Address" class="text-danger"></span></div>
+                <div class="col-md-6"><label asp-for="City" class="form-label"></label><input asp-for="City" class="form-control" /><span asp-validation-for="City" class="text-danger"></span></div>
+                <div class="col-md-6"><label asp-for="PropertyType" class="form-label"></label><select asp-for="PropertyType" class="form-select"><option value="">Choose one</option><option>Apartment</option><option>House</option><option>Cottage</option><option>Studio</option><option>Villa</option></select><span asp-validation-for="PropertyType" class="text-danger"></span></div>
+                <div class="col-12"><label asp-for="PropertyImage" class="form-label"></label><input asp-for="PropertyImage" type="file" accept=".jpg,.jpeg,.png,.webp" class="form-control" data-file-input data-file-status="property-image-status" /><div class="form-text">Required. JPG, PNG or WebP, maximum 5 MB.</div><div id="property-image-status" class="upload-status" aria-live="polite">No file selected.</div><span asp-validation-for="PropertyImage" class="text-danger"></span></div>
+            </div>
+            <button class="btn btn-primary mt-4" type="submit" disabled="@(ViewBag.HasPendingApplication == true)"><i class="bi bi-send-check" aria-hidden="true"></i> Submit application</button>
+        </form>
+    </div></div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#cfe8f3"/><rect y="500" width="1200" height="300" fill="#75a85f"/><circle cx="1020" cy="140" r="70" fill="#ffd66b"/>
+  <rect x="275" y="330" width="650" height="350" rx="10" fill="#fff4dc"/><path d="m220 350 380-255 380 255Z" fill="#8d4737"/><rect x="515" y="495" width="150" height="185" fill="#70452d"/><rect x="340" y="430" width="120" height="120" fill="#87bad0"/><rect x="740" y="430" width="120" height="120" fill="#87bad0"/>
+  <text x="55" y="95" font-family="Arial" font-size="58" font-weight="bold" fill="#23412a">Garden Cottage</text>
+</svg>

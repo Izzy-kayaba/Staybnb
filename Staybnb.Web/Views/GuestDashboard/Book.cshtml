@@ -1,0 +1,29 @@
+@* Collects dates and travellers while leaving the trusted total calculation to the server. *@
+@using System.Globalization
+@model BookPropertyViewModel
+@{ ViewData["Title"] = "Book " + Model.PropertyTitle; }
+<div class="container py-5"><div class="row justify-content-center"><div class="col-lg-7">
+    <a asp-controller="Home" asp-action="Details" asp-route-id="@Model.PropertyId" class="back-link"><i class="bi bi-arrow-left" aria-hidden="true"></i> Back to property</a>
+    <div class="panel mt-3">
+        <span class="eyebrow">Booking request</span><h1 class="h2 fw-bold">@Model.PropertyTitle</h1>
+        <form method="post" data-loading-form data-loading-text="Sending request...">
+            <input asp-for="PropertyId" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row g-3 mt-1">
+                <div class="col-md-6"><label asp-for="CheckInDate" class="form-label"></label><input asp-for="CheckInDate" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")" data-check-in /><span asp-validation-for="CheckInDate" class="text-danger"></span></div>
+                <div class="col-md-6"><label asp-for="CheckOutDate" class="form-label"></label><input asp-for="CheckOutDate" class="form-control" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" data-check-out /><span asp-validation-for="CheckOutDate" class="text-danger"></span></div>
+                <div class="col-12"><label asp-for="NumberOfTravellers" class="form-label"></label><input asp-for="NumberOfTravellers" class="form-control" /><span asp-validation-for="NumberOfTravellers" class="text-danger"></span></div>
+            </div>
+            <div class="price-box mt-4" data-booking-calculator data-nightly-rate="@Model.PricePerNight.ToString(CultureInfo.InvariantCulture)" data-cleaning-fee="@Model.CleaningFee.ToString(CultureInfo.InvariantCulture)" data-service-fee="@Model.ServiceFee.ToString(CultureInfo.InvariantCulture)">
+                <div><span>Price per night</span><strong>@($"R{Model.PricePerNight:N2}")</strong></div>
+                <div><span>Number of nights</span><strong data-night-count>1 night</strong></div>
+                <div><span>Cleaning fee</span><strong>@($"R{Model.CleaningFee:N2}")</strong></div>
+                <div><span>Service fee</span><strong>@($"R{Model.ServiceFee:N2}")</strong></div>
+                <div class="price-total"><span>Estimated total</span><strong data-estimated-total aria-live="polite">Choose valid dates</strong></div>
+            </div>
+            <p class="form-text mt-2">The server recalculates and stores the final total when the request is submitted.</p>
+            <button class="btn btn-primary w-100 mt-4" type="submit"><i class="bi bi-send" aria-hidden="true"></i> Send booking request</button>
+        </form>
+    </div>
+</div></div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

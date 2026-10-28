@@ -1,0 +1,20 @@
+@* Summarises the signed-in Guest's bookings and exposes check-in only when allowed. *@
+@model IReadOnlyList<Booking>
+@{ ViewData["Title"] = "My trips"; }
+<div class="container">
+    <div class="dashboard-header"><div><span class="eyebrow">Guest dashboard</span><h1>My trips</h1><p class="text-muted mb-0">Track requests and complete check-in for approved bookings.</p></div><a class="btn btn-primary" asp-controller="Home" asp-action="Index"><i class="bi bi-search" aria-hidden="true"></i> Find another stay</a></div>
+    @if (Model.Count == 0) { <div class="empty-state"><i class="bi bi-calendar2-x empty-state-icon" aria-hidden="true"></i><strong>No bookings yet</strong><span>Find a property and send your first booking request.</span></div> }
+    <div class="row g-4">
+        @foreach (var booking in Model)
+        {
+            <div class="col-lg-6"><article class="panel h-100">
+                <div class="d-flex flex-column flex-sm-row gap-3"><img src="@(booking.Property?.Images.FirstOrDefault()?.ImageUrl ?? "/images/properties/modern-apartment.png")" alt="@booking.Property?.Title" class="trip-image rounded object-fit-cover" /><div><partial name="_StatusBadge" model="booking.Status.ToString()" /><h2 class="h5 fw-bold mt-2">@booking.Property?.Title</h2><div class="text-muted">@booking.CheckInDate.ToString("dd MMM yyyy") - @booking.CheckOutDate.ToString("dd MMM yyyy") · @booking.NumberOfTravellers traveller(s)</div></div></div>
+                <hr /><div class="d-flex justify-content-between"><span>Total price</span><strong>@($"R{booking.TotalPrice:N2}")</strong></div>
+                @if (booking.Status == BookingStatus.Approved || booking.Status == BookingStatus.CheckedIn)
+                {
+                    <a class="btn btn-outline-dark mt-3" asp-action="CheckIn" asp-route-id="@booking.Id"><i class="bi bi-file-earmark-arrow-up" aria-hidden="true"></i> Continue check-in</a>
+                }
+            </article></div>
+        }
+    </div>
+</div>
